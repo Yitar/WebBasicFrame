@@ -4,7 +4,7 @@
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
-          <element id="module-output" name="WebBasicFrame" />
+          <element id="module-output" name="SSH_WebBasicFrame" />
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:4.2.3.RELEASE" />
@@ -59,7 +59,7 @@
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/WebBasicFrame/target/WebBasicFrame/META-INF/MANIFEST.MF" />
       </element>
-      <element id="javaee-facet-resources" facet="WebBasicFrame/web/Web" />
+      <element id="javaee-facet-resources" facet="SSH_WebBasicFrame/web/Web" />
     </root>
   </artifact>
 </component>
