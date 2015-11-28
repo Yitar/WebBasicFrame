@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:tool="http://www.springframework.org/schema/tool" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/jee
+            http://www.springframework.org/schema/jee/spring-jee.xsd
+            http://www.springframework.org/schema/util
+            http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/tool
+            http://www.springframework.org/schema/tool/spring-tool.xsd"
+       default-lazy-init="true" default-autowire="byName">
+    <!-- -->
+
+    <!-- 让SPRING支持ANNOTATION注解 -->
+    <context:annotation-config />
+    <!-- 设置扫描路径 -->
+    <context:component-scan base-package="*.*" />
+    <!-- 配置数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close"><!-- destroy生命周期 -->
+        <property name="driverClass" value="com.mysql.jdbc.Driver" />
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3306/spring" />
+        <property name="user" value="root" />
+        <property name="password" value="root" />
+        <property name="minPoolSize" value="5" />
+        <property name="maxPoolSize" value="50" />
+        <property name="initialPoolSize" value="5" />
+        <property name="maxIdleTime" value="25000" />
+        <property name="acquireIncrement" value="1" />
+        <property name="acquireRetryAttempts" value="30" />
+        <property name="acquireRetryDelay" value="1000" />
+        <property name="testConnectionOnCheckin" value="true" />
+        <property name="automaticTestTable" value="c3p0TestTable" />
+        <property name="idleConnectionTestPeriod" value="18000" />
+        <property name="checkoutTimeout" value="100" />
+    </bean>
+
+    <!-- 配置 HIBERNATE -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="annotatedClasses">
+            <list>
+                <value>me.yitar.model.User</value>
+            </list>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <value>me.yitar.model</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>
+                hibernate.dialect=org.hibernate.dialect.MySQLDialect
+                hibernate.current_session_context_class=org.springframework.orm.hibernate4.SpringSessionContext
+                hibernate.hbm2ddl.auto=update
+                hibernate.format_sql=true
+                hibernate.show_sql=true
+                hibernate.cache.use_query_cache=true
+                hibernate.cache.use_second_level_cache=true
+                hibernate.cache.provider_class=net.sf.ehcache.hibernate.EhCacheProvider
+                hibernate.cache.region.factory_class=org.hibernate.cache.ehcache.EhCacheRegionFactory
+                net.sf.ehcache.configurationResourceName=ehcache.xml
+            </value>
+        </property>
+    </bean>
+    <!--hibernate template 注入-->
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <!-- 采用注解来管理Bean -->
+    <tx:annotation-driven transaction-manager="txManager" />
+    <!-- 事务配置 -->
+    <bean id="txManager"
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"></property>
+    </bean>
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED" />
+            <tx:method name="update*" propagation="REQUIRED" />
+            <tx:method name="delete*" propagation="REQUIRED" />
+            <tx:method name="test*" propagation="REQUIRED" />
+
+            <tx:method name="get*" propagation="REQUIRED" read-only="true" />
+            <tx:method name="count*" propagation="REQUIRED" read-only="true" />
+            <tx:method name="find*" propagation="REQUIRED" read-only="true" />
+            <tx:method name="*" read-only="true" />
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 只对业务逻辑层实施事务 -->
+    <aop:config proxy-target-class="true">
+        <!-- 只对业务逻辑层实施事务 -->
+        <aop:pointcut id="txPointcut"
+                      expression="execution(public * me.yitar.service..*.*(..))" />
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+    </aop:config>
+</beans>

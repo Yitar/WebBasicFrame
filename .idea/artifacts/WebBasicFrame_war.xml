@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="WebBasicFrame:war">
+    <output-path>$PROJECT_DIR$/WebBasicFrame/target</output-path>
+    <root id="archive" name="WebBasicFrame.war">
+      <element id="artifact" artifact-name="WebBasicFrame:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <!--
+        将struts2交给spring管理 <constant name="struts.objectFactory"
+        value="spring"></constant>
+    -->
+    <constant name="struts.i18n.encoding" value="UTF-8"></constant>
+    <!-- 上传文件大小最大值5M -->
+    <constant name="struts.multipart.maxSize" value="50701096"></constant>
+    <constant name="struts.convention.result.path" value="/WEB-INF/jsp/"></constant>
+    <constant name="struts.action.extension" value="htm" />
+    <constant name="struts.multipart.saveDir" value="/temp"></constant>
+    <constant name="struts.serve.static.browserCache" value="true"></constant>
+    <constant name="struts.devMode" value="false"></constant>
+
+    <package name="userpackage" namespace="/" extends="convention-default">
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+    </package>
+
+    <package name="default" namespace="/" extends="struts-default">
+        <global-results>
+            <result name="error">/error.jsp</result>
+        </global-results>
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception" result="error"/>
+        </global-exception-mappings>
+        <action name="login" class="me.yitar.action.UserAction">
+            <result name="input">/register.jsp</result>
+            <result name="error">/registerFail.jsp</result>
+            <result name="success">/registerSuccess.jsp</result>
+        </action>
+    </package>
+</struts>
